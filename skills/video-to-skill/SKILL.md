@@ -18,28 +18,44 @@ Before attempting extraction, determine three things:
 
 ### 1A — Converter Environment Detection
 
-If running in **Claude.ai or any web-based chat** (no terminal access):
-- Do NOT attempt yt-dlp, ffmpeg, or Whisper commands. They will fail.
-- If the user provided a YouTube URL, respond:
-  "I can't access YouTube directly from this environment. Give me the transcript and I'll convert it into a skill. Here's how to get it:
+When the user provides a YouTube URL, check capabilities in this order. Stop at the first one that works:
 
-  **Desktop (recommended):**
-  1. Open the video in your browser
-  2. Click '...more' under the video title to expand the description
-  3. Look for 'Show transcript' in the expanded description area
-  4. Click it — the transcript panel opens on the right side
-  5. Select all the text, copy, and paste it here
+**Path 1 — YouTube MCP tool available (Claude Desktop, Claude.ai with connectors, or any MCP-enabled client):**
+Check if any connected tool can fetch YouTube content (tool names containing "youtube", "yt-analysis", "transcript", or any tool whose description mentions YouTube video analysis or transcript extraction).
 
-  **If the transcript button is missing:**
-  Some videos don't have transcripts (creator disabled captions, or the video is too new). Use one of these free alternatives instead:
-  - downsub.com — paste the URL, download the transcript
-  - tactiq.io — paste the URL, copy the transcript
+If found: use it directly to pull the transcript. No manual action needed.
+- Call the tool with the provided URL
+- Extract the transcript text from the response
+- If the tool supports it, also request timestamps
+- Proceed to 1B with the extracted transcript
 
-  **If the video is long**, tell me the time range you want converted (e.g. '12:00 to 25:30') and copy just that section."
+If the tool returns an error or empty result, fall through to Path 2.
+
+**Path 2 — Terminal access available (Claude Code, local agents):**
+Proceed to automated extraction in section 1C (yt-dlp → Whisper pipeline).
+
+**Path 3 — No YouTube tool and no terminal (Claude.ai web, ChatGPT, Gemini, text-only chat):**
+Ask the user to provide the transcript manually:
+
+"I don't have a YouTube tool connected in this session, so I can't pull the transcript directly. Give me the transcript and I'll convert it into a skill. Here's how to get it:
+
+**Desktop (recommended):**
+1. Open the video in your browser
+2. Click '...more' under the video title to expand the description
+3. Look for 'Show transcript' in the expanded description area
+4. Click it — the transcript panel opens on the right side
+5. Select all the text, copy, and paste it here
+
+**If the transcript button is missing:**
+Some videos don't have transcripts (creator disabled captions, or the video is too new). Use one of these free alternatives instead:
+- downsub.com — paste the URL, download the transcript
+- tactiq.io — paste the URL, copy the transcript
+
+**If the video is long**, tell me the time range you want converted (e.g. '12:00 to 25:30') and copy just that section.
+
+**Want automatic extraction next time?** In Claude Desktop, connect a YouTube MCP server (like yt-analysis) via Settings → Connectors. Then I can pull transcripts directly from any URL you drop."
+
 - If the user pasted a transcript, proceed to 1B.
-
-If running in **Claude Code or a local agent** (terminal access available):
-- Proceed with automated extraction in section 1C.
 
 ### 1B — Target Environment Detection
 
